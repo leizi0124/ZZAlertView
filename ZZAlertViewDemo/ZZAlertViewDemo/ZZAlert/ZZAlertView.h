@@ -13,34 +13,11 @@ typedef NS_OPTIONS(NSInteger, zShowLocation) {
 };
 @interface ZZAlertView : UIView
 /**
- 左侧按钮
- */
-@property (nonatomic, strong) UIButton *leftBtn;
-/**
- 右侧按钮
- */
-@property (nonatomic, strong) UIButton *rightBtn;
-/**
- 标题
- */
-@property (nonatomic, strong) UILabel *titleLabel;
-/**
- 内容
- */
-@property (nonatomic, strong) UILabel *messageLabel;
-/**
- 内容  第二行
- */
-@property (nonatomic, strong) UILabel *messageDetailLabel;
-/**
  初始化方法
  @param title     标题
- @param message   内容 需要换行以*隔开
- @param imageName 背景图
- 
- @return RGAlertView
+ @param message   内容 
  */
-- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message backgroundImage:(NSString *)imageName;
+- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message;
 /**
  展示
  */

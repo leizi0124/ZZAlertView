@@ -16,10 +16,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+    
+    self.view.backgroundColor = [UIColor blueColor];
 }
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    ZZAlertView *alert = [[ZZAlertView alloc] initWithTitle:@"提示" message:@"哈哈哈哈哈" backgroundImage:nil];
+    ZZAlertView *alert = [[ZZAlertView alloc] initWithTitle:@"提示" message:@"哈哈哈哈哈哈哈哈哈哈哈哈"];
+    [alert addAction:@"确定" handler:^{
+        NSLog(@"确定");
+    }];
+    [alert addAction:@"取消" handler:^{
+        NSLog(@"取消");
+    }];
     [alert show];
 }
 - (void)didReceiveMemoryWarning {
