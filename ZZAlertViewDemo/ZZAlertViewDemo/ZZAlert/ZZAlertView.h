@@ -15,9 +15,9 @@ typedef NS_OPTIONS(NSInteger, zShowLocation) {
 /**
  初始化方法
  @param title     标题
- @param message   内容 
+ @param content   内容 
  */
-- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message;
+- (instancetype)initWithTitle:(NSString *)title content:(NSString *)content;
 /**
  展示
  */
@@ -28,4 +28,10 @@ typedef NS_OPTIONS(NSInteger, zShowLocation) {
  @param handler block事件
  */
 - (UIButton *)addAction:(NSString *)title handler:(void (^)())handler;
+/**
+ toast提示
+ @param toast 提示内容
+ @param duration 展示时间
+ */
++ (void)makeToast:(NSString *)toast duration:(CGFloat)duration;
 @end

@@ -30,12 +30,10 @@ typedef void (^RightBtnBlock)();
 @property (nonatomic, strong) UILabel *titleLabel;
 /** 内容 */
 @property (nonatomic, strong) UILabel *messageLabel;
-/** 内容  第二行 */
-@property (nonatomic, strong) UILabel *messageDetailLabel;
 @end
 @implementation ZZAlertView
-#pragma mark - 初始化
-- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message {
+#pragma mark - alert初始化
+- (instancetype)initWithTitle:(NSString *)title content:(NSString *)content {
     if (self = [super init]) {
         self.frame = [UIScreen mainScreen].bounds;
         
@@ -57,13 +55,9 @@ typedef void (^RightBtnBlock)();
         [_showView addSubview:_titleLabel];
         
         frame = CGRectMake(15, 51, 200, 70);
-        _messageLabel = [[UILabel alloc] initWithFrame:frame];
-        _messageLabel.backgroundColor = [UIColor clearColor];
-        _messageLabel.textAlignment = NSTextAlignmentCenter;
-        _messageLabel.font = [UIFont systemFontOfSize:14.0];
-        _messageLabel.textColor = RGBColor(0x36322f, 1);
-        _messageLabel.text = message;
-        _messageLabel.numberOfLines = 0;
+        [self messageLabelInit];
+        _messageLabel.frame = frame;
+        _messageLabel.text = content;
         CGSize labelSize = [self getSizeWithLabel:_messageLabel maxWidth:200];
         frame = _messageLabel.frame;
         frame.size.height = labelSize.height;
@@ -97,7 +91,7 @@ typedef void (^RightBtnBlock)();
     }
     return self;
 }
-#pragma mark - 添加按钮 最多两个
+/// 添加按钮 最多两个
 - (UIButton *)addAction:(NSString *)title handler:(void (^)())handler {
     
     if (_defaultBtn != nil) {
@@ -140,21 +134,21 @@ typedef void (^RightBtnBlock)();
     }
     return addBtn;
 }
-#pragma mark - 左侧按钮回调
+/// 左侧按钮回调
 - (void)leftBtnAction:(UIButton *)btn {
     if (_leftBlock != nil) {
         _leftBlock();
     }
     [self removeFromSuperview];
 }
-#pragma mark - 右侧按钮回调
+/// 右侧按钮回调
 - (void)rightBtnAction:(UIButton *)btn {
     if (_rightBlock != nil) {
         _rightBlock();
     }
     [self removeFromSuperview];
 }
-#pragma mark - 显示
+/// - 显示
 - (void)show {
     
     UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
@@ -184,16 +178,54 @@ typedef void (^RightBtnBlock)();
     animation.values = values;
     [_showView.layer addAnimation:animation forKey:nil];
 }
-#pragma mark - 移除
+/// 移除
 - (void)defaultBtnAction:(UIButton *)sender {
     [self removeFromSuperview];
 }
-#pragma mark - 字体高度计算
+/// 字体高度计算
 - (CGSize)getSizeWithLabel:(UILabel *)modelLabel maxWidth:(CGFloat)width {
     CGSize size = [_messageLabel.text boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
                                                        options:NSStringDrawingUsesLineFragmentOrigin
                                                     attributes:@{NSFontAttributeName : modelLabel.font}
                                                        context:nil].size;
     return size;
+}
+#pragma mark - toast 初始化
++ (void)makeToast:(NSString *)toast duration:(CGFloat)duration {
+    ZZAlertView *toastView = [[ZZAlertView alloc] init];
+    [toastView messageLabelInit];
+    toastView.backgroundColor = [UIColor lightGrayColor];
+    toastView.messageLabel.text = toast;
+    CGSize size = [toastView getSizeWithLabel:toastView.messageLabel maxWidth:kWidth * 0.8];
+    toastView.messageLabel.frame = CGRectMake(5, 5, size.width, size.height);
+    [toastView addSubview:toastView.messageLabel];
+    toastView.frame = CGRectMake((kWidth - size.width - 10) / 2.0, kHeight / 9.0 * 8.0 - size.height / 2.0, size.width + 10, size.height + 10);
+    toastView.layer.cornerRadius = 2.0;
+    toastView.layer.masksToBounds = YES;
+    
+    UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+    UIVisualEffectView *visualView = [[UIVisualEffectView alloc]initWithEffect:blurEffect];
+    visualView.frame = toastView.bounds;
+    [toastView addSubview:visualView];
+    [toastView insertSubview:visualView atIndex:0];
+    
+    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+    [keyWindow addSubview:toastView];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [toastView removeFromSuperview];
+    });
+}
+
+- (UILabel *)messageLabelInit {
+    if (!_messageLabel) {
+        _messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        _messageLabel.backgroundColor = [UIColor clearColor];
+        _messageLabel.textAlignment = NSTextAlignmentCenter;
+        _messageLabel.font = [UIFont systemFontOfSize:14.0];
+        _messageLabel.textColor = RGBColor(0x36322f, 1);
+        _messageLabel.numberOfLines = 0;
+    }
+    return _messageLabel;
 }
 @end
