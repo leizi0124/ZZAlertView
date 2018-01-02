@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-typedef NS_OPTIONS(NSInteger, zShowLocation) {
+typedef NS_OPTIONS(NSInteger, ZZShowLocation) {
     zShowCenter = 0,        //居中展示
     zShowBottom,            //底部展示
 };
@@ -32,6 +32,8 @@ typedef NS_OPTIONS(NSInteger, zShowLocation) {
  toast提示
  @param toast 提示内容
  @param duration 展示时间
+ @param location 展示位置
+ @param animation 是否显示动画
  */
-+ (void)makeToast:(NSString *)toast duration:(CGFloat)duration;
++ (void)makeToast:(NSString *)toast duration:(CGFloat)duration location:(ZZShowLocation)location animation:(BOOL)animation;
 @end

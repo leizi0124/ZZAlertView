@@ -36,6 +36,7 @@ typedef void (^RightBtnBlock)();
 - (instancetype)initWithTitle:(NSString *)title content:(NSString *)content {
     if (self = [super init]) {
         self.frame = [UIScreen mainScreen].bounds;
+        self.backgroundColor = [UIColor colorWithWhite:0 alpha:0.6];
         
         CGRect frame = CGRectMake((kWidth - 230) / 2.0, (kHeight - 150) / 2.0, 230, 150);
         _showView = [[UIView alloc] initWithFrame:frame];
@@ -91,7 +92,7 @@ typedef void (^RightBtnBlock)();
     }
     return self;
 }
-/// 添加按钮 最多两个
+#pragma mark - 添加按钮 最多两个
 - (UIButton *)addAction:(NSString *)title handler:(void (^)())handler {
     
     if (_defaultBtn != nil) {
@@ -134,21 +135,21 @@ typedef void (^RightBtnBlock)();
     }
     return addBtn;
 }
-/// 左侧按钮回调
+#pragma mark - 左侧按钮回调
 - (void)leftBtnAction:(UIButton *)btn {
     if (_leftBlock != nil) {
         _leftBlock();
     }
     [self removeFromSuperview];
 }
-/// 右侧按钮回调
+#pragma mark - 右侧按钮回调
 - (void)rightBtnAction:(UIButton *)btn {
     if (_rightBlock != nil) {
         _rightBlock();
     }
     [self removeFromSuperview];
 }
-/// - 显示
+#pragma mark - 显示
 - (void)show {
     
     UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
@@ -178,11 +179,11 @@ typedef void (^RightBtnBlock)();
     animation.values = values;
     [_showView.layer addAnimation:animation forKey:nil];
 }
-/// 移除
+#pragma mark - 移除
 - (void)defaultBtnAction:(UIButton *)sender {
     [self removeFromSuperview];
 }
-/// 字体高度计算
+#pragma mark - 字体高度计算
 - (CGSize)getSizeWithLabel:(UILabel *)modelLabel maxWidth:(CGFloat)width {
     CGSize size = [_messageLabel.text boundingRectWithSize:CGSizeMake(width, CGFLOAT_MAX)
                                                        options:NSStringDrawingUsesLineFragmentOrigin
@@ -191,7 +192,7 @@ typedef void (^RightBtnBlock)();
     return size;
 }
 #pragma mark - toast 初始化
-+ (void)makeToast:(NSString *)toast duration:(CGFloat)duration {
++ (void)makeToast:(NSString *)toast duration:(CGFloat)duration location:(ZZShowLocation)location animation:(BOOL)animation {
     ZZAlertView *toastView = [[ZZAlertView alloc] init];
     [toastView messageLabelInit];
     toastView.backgroundColor = [UIColor lightGrayColor];
@@ -199,7 +200,13 @@ typedef void (^RightBtnBlock)();
     CGSize size = [toastView getSizeWithLabel:toastView.messageLabel maxWidth:kWidth * 0.8];
     toastView.messageLabel.frame = CGRectMake(5, 5, size.width, size.height);
     [toastView addSubview:toastView.messageLabel];
-    toastView.frame = CGRectMake((kWidth - size.width - 10) / 2.0, kHeight / 9.0 * 8.0 - size.height / 2.0, size.width + 10, size.height + 10);
+    CGFloat toastY = 0;
+    if (location == zShowCenter) {
+        toastY = kHeight / 2.0 - size.height / 2.0;
+    }else if (location == zShowBottom) {
+        toastY = kHeight / 9.0 * 8.0 - size.height / 2.0;
+    }
+    toastView.frame = CGRectMake((kWidth - size.width - 10) / 2.0, toastY, size.width + 10, size.height + 10);
     toastView.layer.cornerRadius = 2.0;
     toastView.layer.masksToBounds = YES;
     
@@ -212,11 +219,37 @@ typedef void (^RightBtnBlock)();
     UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
     [keyWindow addSubview:toastView];
     
+    if (animation) {
+        CAGradientLayer *graLayer = [CAGradientLayer layer];
+        graLayer.frame = toastView.bounds;
+        graLayer.colors = @[(__bridge id)[[UIColor clearColor] colorWithAlphaComponent:0.5].CGColor,
+                            (__bridge id)[UIColor whiteColor].CGColor,
+                            (__bridge id)[[UIColor clearColor]colorWithAlphaComponent:0.5].CGColor];
+        
+        graLayer.startPoint = CGPointMake(0, 0);//设置渐变方向起点
+        graLayer.endPoint = CGPointMake(1, 0.1);  //设置渐变方向终点
+        graLayer.locations = @[@(0.0), @(0.0), @(0.1)]; //colors中各颜色对应的初始渐变点
+        
+        // 创建动画
+        CABasicAnimation *zAnimation = [CABasicAnimation animationWithKeyPath:@"locations"];
+        zAnimation.duration = 0.5f;
+        zAnimation.toValue = @[@(0.9), @(1.0), @(1.0)];
+        zAnimation.removedOnCompletion = YES;
+        zAnimation.repeatCount = 1;
+        zAnimation.fillMode = kCAFillModeForwards;
+        [graLayer addAnimation:zAnimation forKey:@"zztoast"];
+        [toastView.layer addSublayer:graLayer];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [graLayer removeFromSuperlayer];
+        });
+    }
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [toastView removeFromSuperview];
     });
 }
-
+#pragma mark - 加载
 - (UILabel *)messageLabelInit {
     if (!_messageLabel) {
         _messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
