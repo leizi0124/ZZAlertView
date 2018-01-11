@@ -35,38 +35,6 @@
         
         frame = CGRectOffset(frame, frame.size.width, 0);
     }
-    
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 100, 300, 20)];
-    label.backgroundColor = [UIColor whiteColor];
-    label.text = @"哈哈哈哈哈";
-    label.font = [UIFont systemFontOfSize:20];
-    label.textColor = [UIColor blackColor];
-    label.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:label];
-    
-    // 创建渐变效果的layer
-    CAGradientLayer *graLayer = [CAGradientLayer layer];
-    graLayer.frame = label.bounds;
-    graLayer.colors = @[(__bridge id)[[UIColor clearColor] colorWithAlphaComponent:0.5].CGColor,
-                        (__bridge id)[UIColor whiteColor].CGColor,
-                        (__bridge id)[[UIColor clearColor]colorWithAlphaComponent:0.5].CGColor];
-
-    graLayer.startPoint = CGPointMake(0, 0);//设置渐变方向起点
-    graLayer.endPoint = CGPointMake(1, 0.1);  //设置渐变方向终点
-    graLayer.locations = @[@(0.0), @(0.0), @(0.1)]; //colors中各颜色对应的初始渐变点
-    
-    // 创建动画
-    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"locations"];
-    animation.duration = 1.0f;
-    animation.toValue = @[@(0.9), @(1.0), @(1.0)];
-    animation.removedOnCompletion = YES;
-    animation.repeatCount = 100;
-    animation.fillMode = kCAFillModeForwards;
-    [graLayer addAnimation:animation forKey:@"xindong"];
-    
-    // 将graLayer设置成textLabel的遮罩
-//    label.layer.mask = graLayer;
-    [label.layer addSublayer:graLayer];
 }
 
 - (void)buttonAction:(UIButton *)sender {
@@ -75,9 +43,6 @@
             ZZAlertView *alert = [[ZZAlertView alloc] initWithTitle:@"提示" content:@"哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈"];
             [alert addAction:@"确定" handler:^{
                 NSLog(@"确定");
-            }];
-            [alert addAction:@"取消" handler:^{
-                NSLog(@"取消");
             }];
             [alert show];
         }
